@@ -42,11 +42,6 @@ if (empty($remoto)){
 
 $remoto = $remoto[0];
 
-if (!is_dir('backups')) {
-	if (is_file('backups')) unlink('backups');
-    mkdir('backups', 0777, true);
-}
-
 $backupfile = DESTINO.DIRECTORY_SEPARATOR.$remoto['host'].'.'.$remoto['db'].'_'.date('Y-m-d-H-i-s').'.sql';
 $batfile = DESTINO.DIRECTORY_SEPARATOR.$remoto['host'].'.'.$remoto['db'].'_'.date('Y-m-d-H-i-s').'.bat';
 
@@ -84,3 +79,4 @@ function LaunchBackgroundProcess($command){
 LaunchBackgroundProcess('cmd.exe /Q /C '.$batfile);
 echo $backupfile;
 $l->update('banco',array('ultimo'=>'now()'),array('idbanco'=>$remoto['idbanco']),array('ultimo'));
+$l->insert('log',array('arquivo'=>$backupfile,'banco_idbanco'=>$remoto['idbanco']));
