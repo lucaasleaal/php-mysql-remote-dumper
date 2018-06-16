@@ -1,0 +1,5 @@
+{
+    "require": {
+        "lucaasleaal/mysqlucas": "^1.0"
+    }
+}
