@@ -16,7 +16,7 @@ if (strpos($teste, 'mysqldump.exe')!==false){
 include "vendor/autoload.php";
 $l = mysqlucas::getInstance(HOST,USER,PASS,DATABASE);
 
-$l->mysqli_prepared_query(file_get_contents('database.sql'));
+$l->mysqli_prepared_query(file_get_contents(dirname(__FILE__).DIRECTORY_SEPARATOR.'database.sql'));
 
 $remoto = $l->mysqli_prepared_query("
 	SELECT
