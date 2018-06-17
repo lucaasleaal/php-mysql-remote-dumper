@@ -3,7 +3,7 @@
 ## feito para *Windows*
 
 ### Como utilizar
-1 - Baixe o repositório
+1 - Baixe o repositório e depois as dependências com *composer upgrade*
 
 2 - Crie o banco de dados local e faça as configurações necessárias no cabeçalho da index
 
