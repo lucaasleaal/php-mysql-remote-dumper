@@ -24,7 +24,8 @@ $remoto = $l->mysqli_prepared_query("
 		host,
 		user,
 		pass,
-		db
+		db,
+		maximo
 	FROM banco
 	WHERE
 		(recorrencia='Minuto' and ultimo < NOW() - INTERVAL 1 MINUTE)
@@ -44,6 +45,24 @@ $remoto = $remoto[0];
 
 $backupfile = DESTINO.DIRECTORY_SEPARATOR.$remoto['host'].'.'.$remoto['db'].'_'.date('Y-m-d-H-i-s').'.sql';
 $batfile = DESTINO.DIRECTORY_SEPARATOR.$remoto['host'].'.'.$remoto['db'].'_'.date('Y-m-d-H-i-s').'.bat';
+
+$files = glob(DESTINO.DIRECTORY_SEPARATOR.$remoto['host'].'.'.$remoto['db'].'_'.'*.sql' );
+$exclude_files = array('.', '..');
+if (!in_array($files, $exclude_files)) {
+	array_multisort(
+		array_map( 'filemtime', $files ),
+		SORT_NUMERIC,
+		SORT_ASC,
+		$files
+	);
+}
+if($remoto['maximo']>0){
+	while (count($files)>=$remoto['maximo']) {
+		echo 'Removendo backup antigo: '.$files[0].'<br>';
+		unlink($files[0]);
+		array_shift($files);
+	}
+}
 
 $dbhost = addslashes($remoto['host']);
 $dbuser = addslashes($remoto['user']);
@@ -77,6 +96,6 @@ function LaunchBackgroundProcess($command){
 }
 
 LaunchBackgroundProcess('cmd.exe /Q /C '.$batfile);
-echo $backupfile;
+echo 'Backup novo em: '.$backupfile;
 $l->update('banco',array('ultimo'=>'now()'),array('idbanco'=>$remoto['idbanco']),array('ultimo'));
 $l->insert('log',array('arquivo'=>$backupfile,'banco_idbanco'=>$remoto['idbanco']));
