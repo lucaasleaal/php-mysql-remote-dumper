@@ -18,9 +18,9 @@ CREATE SCHEMA IF NOT EXISTS `mysqlbackup` DEFAULT CHARACTER SET utf8mb4 ;
 USE `mysqlbackup` ;
 
 -- -----------------------------------------------------
--- Table `mysqlbackup`.`banco`
+-- Table `banco`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mysqlbackup`.`banco` (
+CREATE TABLE IF NOT EXISTS `banco` (
   `idbanco` INT NOT NULL AUTO_INCREMENT,
   `host` VARCHAR(255) NOT NULL,
   `user` VARCHAR(255) NOT NULL,
@@ -35,9 +35,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `mysqlbackup`.`log`
+-- Table `log`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mysqlbackup`.`log` (
+CREATE TABLE IF NOT EXISTS `log` (
   `idlog` INT NOT NULL AUTO_INCREMENT,
   `quando` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `arquivo` VARCHAR(255) NOT NULL,
@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS `mysqlbackup`.`log` (
   INDEX `quando` (`quando` ASC),
   CONSTRAINT `fk_log_bancos`
     FOREIGN KEY (`banco_idbanco`)
-    REFERENCES `mysqlbackup`.`banco` (`idbanco`)
+    REFERENCES `banco` (`idbanco`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
