@@ -1,5 +1,5 @@
 {
     "require": {
-        "lucaasleaal/mysqlucas": "^1.0"
+        "lucaasleaal/mysqlucas": "dev-master"
     }
 }
