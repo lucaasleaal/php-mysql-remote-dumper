@@ -4,8 +4,8 @@ define('HOST','localhost');
 define('USER','root');
 define('PASS','');
 define('DATABASE','mysqlbackup');
-define('MYSQLDUMP','D:\wamp\bin\mysql\mysql5.7.21\bin\mysqldump.exe');
-define('DESTINO','D:\wamp\www\php-mysql-remote-dumper\backups');
+define('MYSQLDUMP','C:\wamp64\bin\mysql\mysql5.7.23\bin\mysqldump.exe');
+define('DESTINO','D:\backups\_bancos');
 date_default_timezone_set('America/Sao_Paulo');
 
 $teste = shell_exec("tasklist 2>NUL");
@@ -71,7 +71,7 @@ $dbname = preg_replace('/[^0-9a-zA-Z$_]/m', '', $remoto['db']);
 
 $comando = "@ECHO OFF";
 $comando.= PHP_EOL."SETLOCAL";
-$comando.= PHP_EOL.MYSQLDUMP." -h $dbhost -u $dbuser ".((!empty($dbpass))?"-p$dbpass ":'')."$dbname > $backupfile";
+$comando.= PHP_EOL.MYSQLDUMP." --skip-lock-tables --quick --single-transaction=TRUE -h $dbhost -u $dbuser ".((!empty($dbpass))?"-p$dbpass ":'')."$dbname > $backupfile";
 $comando.= PHP_EOL.'DEL "%~f0"';
 
 file_put_contents($batfile, $comando);
