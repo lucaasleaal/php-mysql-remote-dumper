@@ -1,11 +1,29 @@
 <?php
+function is_connected(){
+    $connected = @fsockopen("www.google.com", 80);
+                                        //website, port  (try 80 or 443)
+    if ($connected){
+        $is_conn = true; //action when connected
+        fclose($connected);
+    }else{
+        $is_conn = false; //action in connection failure
+    }
+    return $is_conn;
+
+}
+
+if (!is_connected()){
+	echo 'Não há internet';exit;
+}
+
+
 set_time_limit(1800);
 define('HOST','localhost');
 define('USER','root');
 define('PASS','');
 define('DATABASE','mysqlbackup');
-define('MYSQLDUMP','C:\wamp64\bin\mysql\mysql5.7.23\bin\mysqldump.exe');
-define('DESTINO','D:\backups\_bancos');
+define('MYSQLDUMP','C:\wamp64\bin\mysql\mysql8.0.21\bin\mysqldump.exe');
+define('DESTINO','D:\Backups\_bancos');
 date_default_timezone_set('America/Sao_Paulo');
 
 $teste = shell_exec("tasklist 2>NUL");
@@ -25,6 +43,7 @@ $remoto = $l->mysqli_prepared_query("
 		user,
 		pass,
 		db,
+		recorrencia,
 		maximo
 	FROM banco
 	WHERE
@@ -42,11 +61,12 @@ if (empty($remoto)){
 }
 
 $remoto = $remoto[0];
+$remoto['recorrencia'] = str_replace('ê', 'e', $remoto['recorrencia']);
+$backupfile = DESTINO.DIRECTORY_SEPARATOR.$remoto['host'].'.'.$remoto['db'].'_'.$remoto['recorrencia'].'_'.date('Y-m-d-H-i-s').'.sql';
+$backupfilezip = DESTINO.DIRECTORY_SEPARATOR.$remoto['host'].'.'.$remoto['db'].'_'.$remoto['recorrencia'].'_'.date('Y-m-d-H-i-s').'.7z';
+$batfile = DESTINO.DIRECTORY_SEPARATOR.$remoto['host'].'.'.$remoto['db'].'_'.$remoto['recorrencia'].'_'.date('Y-m-d-H-i-s').'.bat';
 
-$backupfile = DESTINO.DIRECTORY_SEPARATOR.$remoto['host'].'.'.$remoto['db'].'_'.date('Y-m-d-H-i-s').'.sql';
-$batfile = DESTINO.DIRECTORY_SEPARATOR.$remoto['host'].'.'.$remoto['db'].'_'.date('Y-m-d-H-i-s').'.bat';
-
-$files = glob(DESTINO.DIRECTORY_SEPARATOR.$remoto['host'].'.'.$remoto['db'].'_'.'*.sql' );
+$files = glob(DESTINO.DIRECTORY_SEPARATOR.$remoto['host'].'.'.$remoto['db'].'_'.$remoto['recorrencia'].'_'.'*.7z' );
 $exclude_files = array('.', '..');
 if (!in_array($files, $exclude_files)) {
 	array_multisort(
@@ -71,7 +91,8 @@ $dbname = preg_replace('/[^0-9a-zA-Z$_]/m', '', $remoto['db']);
 
 $comando = "@ECHO OFF";
 $comando.= PHP_EOL."SETLOCAL";
-$comando.= PHP_EOL.MYSQLDUMP." --skip-lock-tables --quick --single-transaction=TRUE -h $dbhost -u $dbuser ".((!empty($dbpass))?"-p$dbpass ":'')."$dbname > $backupfile";
+$comando.= PHP_EOL.MYSQLDUMP." --column-statistics=0 --skip-lock-tables --quick --single-transaction=TRUE -h $dbhost -u $dbuser ".((!empty($dbpass))?"-p$dbpass ":'')."$dbname > $backupfile";
+$comando.= PHP_EOL."\"C:\Program Files\\7-Zip\\7z.exe\" a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on $backupfilezip $backupfile -sdel";
 $comando.= PHP_EOL.'DEL "%~f0"';
 
 file_put_contents($batfile, $comando);
